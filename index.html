@@ -54,6 +54,27 @@ kbd{font:600 .85em var(--f-mono);border:1px solid var(--line2);border-bottom-wid
 .segs button.p{background:color-mix(in srgb,var(--accent) 45%,var(--line))}
 .segs button.c{background:var(--accent)}
 .segs button[disabled]{cursor:default}
+.pbar{display:none;width:100%;align-items:center;gap:10px;margin-top:8px;padding:6px 2px;background:none;border:0;font:inherit;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pbar .trk{position:relative;flex:1;height:8px;border-radius:5px;background:var(--line);overflow:hidden}
+.pbar .trk i{position:absolute;left:0;top:0;bottom:0;border-radius:5px}
+.pbar .rch{background:color-mix(in srgb,var(--accent) 35%,var(--line))}
+.pbar .cur{background:var(--accent)}
+.pbar .pl{font:600 13px/1 var(--f-body);white-space:nowrap;display:flex;align-items:center;gap:4px}
+.pbar .pl .i{width:16px;height:16px}
+@media (max-width:600px){.top .segs.lsegs{display:none}.pbar{display:flex}}
+details.lexd{margin:16px 0 0;border:1px solid var(--line);border-radius:14px;background:var(--raise)}
+details.lexd>summary{list-style:none;display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;font:600 14.5px/1.3 var(--f-body);color:var(--accent)}
+details.lexd>summary::-webkit-details-marker{display:none}
+details.lexd>summary .i{width:18px;height:18px;flex:none}
+details.lexd>summary .cnt{margin-left:auto;font-size:12.5px;color:var(--muted);font-weight:600}
+details.lexd>summary .chev{width:18px;height:18px;transition:transform .2s;color:var(--muted)}
+details.lexd[open]>summary .chev{transform:rotate(180deg)}
+.lexmini{border-top:1px solid var(--line);padding:4px 0}
+.lexmini button{display:block;width:100%;text-align:left;background:none;border:0;padding:8px 14px;font:14.5px/1.4 var(--f-body);color:var(--ink);cursor:pointer}
+.lexmini button:hover{background:var(--accent-soft)}
+.lexmini b{font-weight:650}
+.lexmini span{color:var(--muted)}
+.lexmini .more{font-size:12.5px;color:var(--muted);padding:6px 14px 8px;margin:0}
 /* кнопки */
 .btn{font:600 15px/1 var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:13px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px}
 .btn:hover{border-color:var(--line2)}
@@ -768,6 +789,9 @@ function gloss(root,skip){if(!root||!LEXRX.length)return;const blocks=new Map();
     if(p<t.length)f.appendChild(document.createTextNode(t.slice(p)));n.replaceWith(f)})}
 function lexIn(html,skip){const d=document.createElement("div");d.innerHTML=html||"";const out=[];lexMatches(d.textContent).forEach(m=>{if(!out.includes(m[2])&&!(skip&&skip.has(m[2])))out.push(m[2])});return out}
 function lexRow(i,from){const e=LEX[i];return '<button class="lexrow" data-g="'+i+'"><b>'+esc(e.k)+'</b>'+(e.d?' <span class="dd">· '+esc(e.d)+'</span>':'')+'<span class="mm">'+esc(e.m)+'</span>'+(from&&e.lesson?'<span class="from">'+esc(e.lesson.title)+'</span>':'')+'</button>'}
+function firstSent(t){const m=String(t).match(/^.*?[.!?](?=\s|$)/);if(!m)return t;if(m[0].length<25){const m2=String(t).match(/^.*?[.!?](?=\s|$).*?[.!?](?=\s|$)/);if(m2)return m2[0]}return m[0]}
+function lexFold(ids){if(!ids.length)return"";let open=false;try{open=localStorage.getItem("vpd1lexd")==="1"}catch(e){}
+  return '<details class="lexd"'+(open?' open':'')+'><summary>'+IC.book+'<span>Что значит каждое слово</span><span class="cnt">'+ids.length+'</span>'+IC.chev+'</summary><div class="lexmini">'+ids.map(i=>'<button data-g="'+i+'"><b>'+esc(LEX[i].k)+'</b> <span>· '+esc(firstSent(LEX[i].m))+'</span></button>').join("")+'<p class="more">Нажми на слово, чтобы открыть полное объяснение.</p></div></details>'}
 function lexBox(ids,title){return ids.length?'<div class="lexbox"><div class="lh">'+title+'</div>'+ids.map(i=>lexRow(i)).join("")+'</div>':""}
 function lexChips(ids){return '<div class="chips">'+ids.map(i=>'<button class="chip tap" data-g="'+i+'">'+esc(LEX[i].k)+'</button>').join("")+'</div>'}
 function showLex(i){const e=LEX[i];if(!e)return;const box=$("#def");
@@ -1041,7 +1065,8 @@ function renderStep(){
   if(st.t==="word"&&st.node){S.seen=S.seen||{};S.seen[st.node]=1}
   (st.unlock||[]).forEach(k=>{S.seen=S.seen||{};S.seen[k]=1}); save();
   S.max=S.max||{};S.max[l.id]=Math.max(S.max[l.id]||0,idx);S.lastL=l.id;const reach=S.done[l.id]?n-1:S.max[l.id];
-  const segs='<div class="segs">'+l.steps.map((x,i)=>'<button aria-label="Шаг '+(i+1)+'" data-go="'+i+'" class="'+(i===idx?'c':i<=reach?'p':'')+'"'+(i>reach?' disabled':'')+'></button>').join("")+'</div>';
+  const pbar='<button class="pbar" id="pbar" aria-label="Список шагов"><span class="trk"><i class="rch" style="width:'+((reach+1)/n*100).toFixed(1)+'%"></i><i class="cur" style="width:'+((idx+1)/n*100).toFixed(1)+'%"></i></span><span class="pl">'+(idx+1)+' из '+n+IC.list+'</span></button>';
+  const segs=pbar+'<div class="segs lsegs">'+l.steps.map((x,i)=>'<button aria-label="Шаг '+(i+1)+'" data-go="'+i+'" class="'+(i===idx?'c':i<=reach?'p':'')+'"'+(i>reach?' disabled':'')+'></button>').join("")+'</div>';
   let h=topbar(l.topic.title,l.title,'<a class="iconbtn" href="#dict/'+l.id+'" aria-label="Словарь">'+IC.book+'</a><a class="iconbtn" href="#map/'+l.id+'" aria-label="Карта знаний">'+IC.map+'</a>',segs);
   h+='<div class="card"><div class="kind"><span class="pill" style="--k:'+KC[st.t]+'">'+KIND[st.t]+'</span><span>'+(idx+1)+' / '+n+'</span></div>';
   let gate=false, own=null;
@@ -1050,7 +1075,7 @@ function renderStep(){
   else if(st.t==="story") h+='<h2>'+st.h+'</h2>'+mapHTML(l.topic,null,true)+st.body;
   else if(st.t==="word"){own=lexIn(st.term+" · "+(st.pt||""));const inPro=lexIn(st.pro||"",new Set(own));
     h+='<div class="term">'+st.term+'</div>'+(st.pt?'<p class="note" style="margin:-2px 0 12px">Как называют программисты: <b>'+esc(st.pt)+'</b></p>':'')+'<div class="lab">Простыми словами</div><p>'+st.simple+'</p><div class="lab">На что похоже</div><p class="like">'+st.like+'</p><div class="lab">Пример</div><p>'+st.ex+'</p>'+(st.pro?'<div class="lab">Как говорят программисты</div><div class="pro">'+st.pro+'</div>':'')+
-      lexBox(inPro,"Разбор фразы: что значит каждое слово")+lexBox(own,"В словаре")}
+      lexFold(inPro)}
   else if(st.t==="predict"||st.t==="check"){gate=true;
     h+='<h2 class="q">'+st.q+'</h2>'+(st.t==="predict"?'<p class="note">Ответь до объяснения. Ошибиться здесь нормально: неожиданный ответ запоминается лучше.</p>':'')+
       '<div class="opts">'+st.o.map((o,i)=>'<button class="opt" data-i="'+i+'">'+o+'</button>').join("")+'</div><div class="reveal" id="rev" hidden></div>'}
@@ -1122,6 +1147,8 @@ function renderStep(){
     if(passed)next.disabled=false}
   $("#back").onclick=()=>{idx--;renderStep()};
   $$(".segs [data-go]").forEach(b=>b.onclick=()=>{idx=+b.dataset.go;renderStep()});
+  $("#pbar").onclick=()=>$("#stepsBtn").click();
+  const ld=$("details.lexd");if(ld)ld.addEventListener("toggle",()=>{try{localStorage.setItem("vpd1lexd",ld.open?"1":"0")}catch(e){}});
   $("#stepsBtn").onclick=()=>{const body='<p class="note" style="margin-top:0">Можно вернуться к любому пройденному шагу. Новые откроются по мере прохождения.</p><div class="steplist">'+l.steps.map((x,i)=>{const ok=(S.passed||{})[l.id+":"+i]||i<reach;
       return '<button data-go="'+i+'" class="'+(i===idx?'cur':ok?'p':'')+'"'+(i>reach?' disabled':'')+'><span class="n">'+(i===idx?(i+1):ok?'✓':(i+1))+'</span><span class="t"><span style="--k:'+KC[x.t]+'">'+KIND[x.t]+'</span><b>'+esc(stepTitle(x))+'</b></span><span>'+(i>reach?'':IC.next)+'</span></button>'}).join("")+'</div>';
     const sh=openSheet(esc(l.title),body);$$(".steplist [data-go]",sh).forEach(b=>b.onclick=()=>{closeSheets();idx=+b.dataset.go;renderStep()});
