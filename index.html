@@ -8,7 +8,7 @@
 :root{
   --bg:#FFFFFF; --surface:#FFFFFF; --raise:#F4F4F1; --ink:#1C1D20; --muted:#686B71; --line:#E9E9E5; --line2:#D2D3CE;
   --accent:#1C1D20; --accent-ink:#FFFFFF; --accent-soft:#F1F1ED; --accent-2:#3B3D42;
-  --mark:#FFE15A; --mark-soft:#FFF3B0; --mark-ink:#1C1D20;
+  --mark:#3D6B52; --mark-soft:#DCE8DF; --mark-ink:#FFFFFF;
   --ok:#1E7A4C; --ok-soft:#EAF4EE; --bad:#C2372B; --bad-soft:#FCEDEB; --warm:#8C5B00; --warm-soft:#FFF6D8;
   --code-bg:#F4F4F1; --code-ink:#1C1D20; --scrim:rgba(20,21,24,.32);
   --f-display:"Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -19,13 +19,13 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#17181A; --surface:#17181A; --raise:#212225; --ink:#ECECE8; --muted:#9C9EA3; --line:#2A2B2F; --line2:#3C3E43;
   --accent:#ECECE8; --accent-ink:#17181A; --accent-soft:#232427; --accent-2:#D4D4D0;
-  --mark:#E9CD45; --mark-soft:#3A3417; --mark-ink:#17181A;
+  --mark:#44735A; --mark-soft:#253A2E; --mark-ink:#F0F4F1;
   --ok:#6DCB97; --ok-soft:#18271F; --bad:#F2897C; --bad-soft:#33201D; --warm:#E8C35A; --warm-soft:#2E2816;
   --code-bg:#212225; --code-ink:#E2E2DE; --scrim:rgba(0,0,0,.55); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#17181A; --surface:#17181A; --raise:#212225; --ink:#ECECE8; --muted:#9C9EA3; --line:#2A2B2F; --line2:#3C3E43;
   --accent:#ECECE8; --accent-ink:#17181A; --accent-soft:#232427; --accent-2:#D4D4D0;
-  --mark:#E9CD45; --mark-soft:#3A3417; --mark-ink:#17181A;
+  --mark:#44735A; --mark-soft:#253A2E; --mark-ink:#F0F4F1;
   --ok:#6DCB97; --ok-soft:#18271F; --bad:#F2897C; --bad-soft:#33201D; --warm:#E8C35A; --warm-soft:#2E2816;
   --code-bg:#212225; --code-ink:#E2E2DE; --scrim:rgba(0,0,0,.55); color-scheme:dark}
 *{box-sizing:border-box}
@@ -34,7 +34,7 @@ html{-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--ink);font:17px/1.62 var(--f-body);margin:0;font-feature-settings:"kern","liga"}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
 a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:3px}
-::selection{background:var(--mark);color:var(--mark-ink)}
+::selection{background:var(--mark-soft);color:var(--ink)}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:6px}
 svg.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 code{font-family:var(--f-mono);background:var(--code-bg);color:var(--code-ink);padding:.1em .36em;border-radius:4px;font-size:.84em;overflow-wrap:anywhere}
@@ -109,7 +109,7 @@ ol,ul{padding-left:1.3em}
 li{margin:5px 0}
 li::marker{color:var(--muted)}
 .term{font:700 clamp(32px,8.4vw,44px)/1.14 var(--f-display);margin:0 0 16px;letter-spacing:-.025em;text-wrap:balance}
-.term span{background:linear-gradient(transparent 52%,var(--mark) 52%,var(--mark) 90%,transparent 90%);-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 .06em}
+.term span{background:linear-gradient(transparent 54%,var(--mark-soft) 54%,var(--mark-soft) 92%,transparent 92%);-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 .06em}
 .lab{font:600 14px/1.3 var(--f-body);color:var(--muted);margin:26px 0 6px}
 .lab:first-of-type{margin-top:0}
 .like{border-left:2px solid var(--line2);padding:2px 0 2px 16px;margin:0}
@@ -158,7 +158,7 @@ th{font-weight:600;font-size:13.5px;color:var(--muted);border-bottom-color:var(-
 .chip::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--line2)}
 .chip:hover{border-color:var(--ink)}
 .chip.got::before{background:var(--ok)}
-.chip.here{border-color:var(--ink);background:var(--mark);color:var(--mark-ink)}
+.chip.here{border-color:var(--mark);background:var(--mark);color:var(--mark-ink)}
 .chip.here::before{background:var(--mark-ink)}
 .chip.lock{color:var(--muted);border-style:dashed;background:transparent}
 .chip.plain{cursor:default}
@@ -203,7 +203,7 @@ th{font-weight:600;font-size:13.5px;color:var(--muted);border-bottom-color:var(-
 .steplist button[disabled]{opacity:.45;cursor:default}
 .steplist .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:500 12.5px var(--f-body);border:1px solid var(--line2);color:var(--muted);font-variant-numeric:tabular-nums}
 .steplist .done .n,.steplist button.p .n{background:var(--ink);border-color:var(--ink);color:var(--accent-ink)}
-.steplist button.cur .n{background:var(--mark);border-color:var(--ink);color:var(--mark-ink)}
+.steplist button.cur .n{background:var(--mark);border-color:var(--mark);color:var(--mark-ink)}
 .steplist .t b{display:block;font-weight:500;font-size:15px;line-height:1.3}
 .steplist .t span{font-size:12.5px;color:var(--muted)}
 
@@ -258,7 +258,7 @@ details.topic[open]>summary .chev{transform:rotate(180deg)}
 .lesson:hover{background:var(--raise)}
 .lesson .dot{width:28px;height:28px;margin-left:1px;border-radius:50%;border:1px solid var(--line2);display:grid;place-items:center;font:500 12.5px var(--f-body);color:var(--muted);font-variant-numeric:tabular-nums}
 .lesson.done .dot{background:var(--ink);border-color:var(--ink);color:var(--accent-ink)}
-.lesson.cur .dot{background:var(--mark);border-color:var(--ink);color:var(--mark-ink);font-weight:600}
+.lesson.cur .dot{background:var(--mark);border-color:var(--mark);color:var(--mark-ink);font-weight:600}
 .lesson b{display:block;font-weight:500;font-size:15.5px;line-height:1.35}
 .lesson.cur b{font-weight:600}
 .lesson span{font-size:13px;color:var(--muted)}
@@ -1025,7 +1025,7 @@ function mapHTML(t,hereLesson,mini){const m=t.map;if(!m)return"";let h='<div cla
   m.rows.forEach((r,i)=>{h+='<div class="layer"><div class="lh"><span class="num">'+(i+1)+'</span><span class="lt">'+esc(r.label)+'</span></div><div class="chips">'+chipsRow(r.nodes,hereLesson)+'</div></div>';
     if(i<m.rows.length-1)h+='<div class="link"><span class="ln"></span>'+(r.arrow?'<span class="lbl">'+esc(r.arrow)+'</span><span class="ln"></span>':'')+'<span class="ar"></span></div>'});
   return h+'</div>'}
-function legend(){return '<div class="legend"><span><i style="background:var(--ok)"></i>пройдено</span><span><i style="background:var(--mark);outline:1px solid var(--ink);outline-offset:-1px"></i>в этом уроке</span><span><i style="background:var(--line2)"></i>впереди</span></div>'}
+function legend(){return '<div class="legend"><span><i style="background:var(--ok)"></i>пройдено</span><span><i style="background:var(--mark)"></i>в этом уроке</span><span><i style="background:var(--line2)"></i>впереди</span></div>'}
 function showDef(id){const n=NODES[id];if(!n)return;const open=isOpen(id);const box=$("#def");
   box.innerHTML='<div class="grab"></div><div class="hd"><b>'+(open?esc(n.label):'Ещё впереди')+'</b><button class="iconbtn" data-close aria-label="Закрыть">'+IC.close+'</button></div><div class="bd">'+
    (open?'<div class="lab">Простыми словами</div><p>'+n.simple+'</p>'+(n.pro?'<div class="lab">Как говорят программисты</div><div class="pro">'+n.pro+'</div>':''):'<p>Это понятие откроется в уроке «'+esc(n.lesson?n.lesson.title:'')+'». Не подглядываем: так оно лучше запомнится.</p>')+
